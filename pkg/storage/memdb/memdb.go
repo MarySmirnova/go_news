@@ -1,6 +1,8 @@
 package memdb
 
-import "GoNews/pkg/storage"
+import "github.com/MarySmirnova/go_news/pkg/storage"
+
+var _ storage.Interface = &Store{}
 
 // Хранилище данных.
 type Store struct{}

@@ -1,5 +1,7 @@
 package storage
 
+import "time"
+
 // Post - публикация.
 type Post struct {
 	ID          int
@@ -7,8 +9,8 @@ type Post struct {
 	Content     string
 	AuthorID    int
 	AuthorName  string
-	CreatedAt   int64
-	PublishedAt int64
+	CreatedAt   time.Time
+	PublishedAt time.Time
 }
 
 // Interface задаёт контракт на работу с БД.

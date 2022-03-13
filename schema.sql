@@ -10,7 +10,7 @@ CREATE TABLE posts (
     author_id INTEGER REFERENCES authors(id) NOT NULL,
     title TEXT  NOT NULL,
     content TEXT NOT NULL,
-    created_at BIGINT NOT NULL
+    created_at TIMESTAMP NOT NULL
 );
 
 INSERT INTO authors (id, name) VALUES (0, 'Дмитрий');

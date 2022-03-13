@@ -1,1 +1,2 @@
 # go-db-practice-gonews
+
