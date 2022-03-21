@@ -2,9 +2,11 @@ package mongo
 
 import (
 	"context"
+	"errors"
 
 	"github.com/MarySmirnova/go_news/pkg/storage"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -38,7 +40,7 @@ func New(connstr string) (*Store, error) {
 
 func (s *Store) Posts() ([]storage.Post, error) {
 	collection := s.db.Database(NameDB).Collection(NameCollection)
-	filter := bson.D{}
+	filter := bson.D{{}}
 
 	cur, err := collection.Find(ctx, filter)
 	if err != nil {
@@ -69,12 +71,36 @@ func (s *Store) AddPost(p storage.Post) error {
 	return nil
 }
 
-func (s *Store) UpdatePost(storage.Post) error {
+func (s *Store) UpdatePost(p storage.Post) error {
+	collection := s.db.Database(NameDB).Collection(NameCollection)
+	filter := bson.D{primitive.E{Key: "id", Value: p.ID}}
+	update := bson.D{primitive.E{Key: "$set", Value: bson.D{
+		primitive.E{Key: "title", Value: p.Title},
+		primitive.E{Key: "content", Value: p.Content},
+		primitive.E{Key: "author_id", Value: p.AuthorID},
+		primitive.E{Key: "author_name", Value: p.AuthorName},
+	}}}
+
+	res := collection.FindOneAndUpdate(ctx, filter, update)
+	if res.Err() != nil {
+		return res.Err()
+	}
 
 	return nil
 }
 
-func (s *Store) DeletePost(storage.Post) error {
+func (s *Store) DeletePost(p storage.Post) error {
+	collection := s.db.Database(NameDB).Collection(NameCollection)
+	filter := bson.D{primitive.E{Key: "id", Value: p.ID}}
+
+	res, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	if res.DeletedCount == 0 {
+		return errors.New("no posts were deleted")
+	}
 
 	return nil
 }
